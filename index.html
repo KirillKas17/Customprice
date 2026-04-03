@@ -1,0 +1,586 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promo Manager</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+<div class="login-screen flex justify-center items-center min-h-screen" id="loginScreen">
+<div class="login-box">
+<h1 class="text-3xl font-bold mb-3 text-gray-800">Promo Manager</h1>
+<p class="text-gray-600 mb-8">Корпоративная система управления промо-акциями</p>
+<div class="mb-6 text-left">
+<label class="block mb-3 font-semibold text-gray-700">Выберите пользователя:</label>
+<select class="form-control" id="roleSelect">
+<option value="">-- Выберите пользователя --</option>
+</select>
+</div>
+<button type="submit" class="btn-custom btn-full" onclick="login()">
+Войти в систему
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path>
+</svg>
+</button>
+</div>
+</div>
+
+<div class="app-container hidden" id="appContainer">
+<header class="bg-white/80 backdrop-blur-md shadow-lg py-4 px-8 flex justify-between items-center sticky top-0 z-50">
+<h1 class="text-xl font-bold text-gray-800">Promo Manager</h1>
+<div class="flex items-center gap-5">
+<span class="px-4 py-1.5 bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-full text-sm font-semibold" id="userRole">Менеджер</span>
+<span class="font-medium text-gray-700" id="userName">Александр</span>
+<button class="btn-custom small danger" onclick="logout()">Выйти</button>
+</div>
+</header>
+
+<nav class="bg-white/60 backdrop-blur-md border-b border-gray-200 px-8">
+<div class="nav-tabs" id="navTabs"></div>
+</nav>
+
+<main class="p-8 max-w-7xl mx-auto">
+<div class="alerts-container" id="alertsContainer"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- 1. Create Promo Section -->
+<div class="section" id="createPromoSection">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Создание новой промо-акции</div>
+<div class="flex gap-3">
+<button type="button" class="btn-custom small secondary" onclick="clearTable()">
+Очистить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small success" onclick="savePromo()">
+Сохранить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+</div>
+<div class="card-body">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-7">
+<div>
+<label class="block mb-2 font-semibold text-gray-700">Сеть магазинов:</label>
+<select class="form-control" id="networkSelect" onchange="onNetworkChange()">
+<option value="">-- Выберите сеть --</option>
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700">Название акции:</label>
+<input type="text" class="form-control" id="promoName" placeholder="Например: Скидки недели">
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700">Комментарий:</label>
+<input type="text" class="form-control" id="promoComment" placeholder="Дополнительная информация">
+</div>
+</div>
+<div class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th style="width: 45px;"><input type="checkbox" class="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+<th>Наименование</th>
+<th style="width: 110px;">Базовая цена</th>
+<th style="width: 120px;">Акционная цена</th>
+<th style="width: 110px;">Скидка %</th>
+<th style="width: 140px;">Дата начала</th>
+<th style="width: 140px;">Дата окончания</th>
+<th style="width: 50px;"></th>
+</tr>
+</thead>
+<tbody id="promoTableBody"></tbody>
+</table>
+</div>
+<div class="flex flex-wrap justify-between items-center gap-4 pt-5 mt-5 border-t-2 border-gray-300">
+<div class="flex flex-col gap-3">
+<div class="flex gap-3">
+<button type="button" class="btn-custom small" onclick="addRow()">
++ Строка
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small warning" onclick="applyDatesToAll()">
+Применить ко всем датам
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small danger" onclick="bulkDelete()">
+Удалить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+<div class="bulk-row-control">
+<label>
+<input type="checkbox" id="bulkRowCheckbox" onchange="toggleBulkRowInput()">
+</label>
+<label for="bulkRowCount">x</label>
+<input type="number" id="bulkRowCount" min="1" max="30" value="5" disabled>
+<button type="button" class="btn-custom small" onclick="addBulkRows()">Добавить</button>
+</div>
+</div>
+<p class="helper-text m-0">Совет: Скопируйте данные из Excel и вставьте (Ctrl+V)</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2. My Promos Status Section -->
+<div class="section" id="myPromosSection">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Мои отправленные промо</div>
+<button type="button" class="btn-custom small" onclick="loadMyPromos()">
+Обновить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+<div class="card-body">
+<div class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th>Дата отправки</th>
+<th>Сеть</th>
+<th>Акция</th>
+<th>Позиций</th>
+<th>Статус у техника</th>
+<th>Загружено</th>
+<th>Действия</th>
+</tr>
+</thead>
+<tbody id="myPromosTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 3. Active Promos Section -->
+<div class="section" id="activePromosSection">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-7">
+<div class="stat-card success">
+<div class="stat-label">Активных промо</div>
+<div class="stat-value" id="statActive">0</div>
+</div>
+<div class="stat-card warning">
+<div class="stat-label">Заканчиваются (≤3 дн.)</div>
+<div class="stat-value warning" id="statExpiring">0</div>
+</div>
+<div class="stat-card danger">
+<div class="stat-label">Просрочено</div>
+<div class="stat-value danger" id="statExpired">0</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Всего позиций</div>
+<div class="stat-value" id="statTotalItems">0</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<div class="card-title">Активные промо-акции</div>
+<button type="button" class="btn-custom small" onclick="loadActivePromos()">
+Обновить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+<div class="card-body">
+<div class="card" style="padding: 20px; box-shadow: inset 5px 5px 10px #ebebeb, inset -5px -5px 10px #ffffff;">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Сеть:</label>
+<select class="form-control" id="filterNetwork" onchange="applyFilters()">
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Статус:</label>
+<select class="form-control" id="filterStatus" onchange="applyFilters()">
+<option value="">Все статусы</option>
+<option value="active">Активные</option>
+<option value="expiring">Заканчиваются</option>
+<option value="expired">Просрочено</option>
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Поиск:</label>
+<input type="text" class="form-control" id="filterSku" placeholder="Введите название" oninput="applyFilters()">
+</div>
+</div>
+</div>
+<div class="table-container mt-5">
+<table class="data-table">
+<thead>
+<tr>
+<th>Сеть</th>
+<th>Акция</th>
+<th>Наименование</th>
+<th>Базовая цена</th>
+<th>Акционная цена</th>
+<th>Период</th>
+<th>Осталось</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody id="activePromosTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 4. Promotional Prices Section (NEW) -->
+<div class="section" id="promoPricesSection">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Акционные цены по сетям</div>
+<button type="button" class="btn-custom small" onclick="loadPromoPrices()">
+Обновить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+<div class="card-body">
+<div class="card" style="padding: 20px; box-shadow: inset 5px 5px 10px #ebebeb, inset -5px -5px 10px #ffffff;">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Выберите сеть:</label>
+<select class="form-control" id="promoPriceNetwork" onchange="loadPromoPrices()">
+<option value="">-- Выберите сеть --</option>
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Менеджер:</label>
+<select class="form-control" id="promoPriceManager" onchange="loadPromoPrices()">
+<option value="">Все менеджеры</option>
+<option value="manager1">Александр</option>
+<option value="manager2">Елена</option>
+<option value="manager3">Дмитрий</option>
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Поиск:</label>
+<input type="text" class="form-control" id="promoPriceSearch" placeholder="Наименование товара" oninput="loadPromoPrices()">
+</div>
+</div>
+</div>
+<div class="table-container mt-5">
+<table class="data-table">
+<thead>
+<tr>
+<th onclick="sortPromoPrices('network')">Сеть <span class="sort-indicator promo-price-sort" id="promo-sort-network"></span></th>
+<th onclick="sortPromoPrices('name')">Наименование <span class="sort-indicator promo-price-sort" id="promo-sort-name"></span></th>
+<th onclick="sortPromoPrices('basePrice')">Регулярная цена <span class="sort-indicator promo-price-sort" id="promo-sort-basePrice"></span></th>
+<th onclick="sortPromoPrices('promoPrice')">Акционная цена <span class="sort-indicator promo-price-sort" id="promo-sort-promoPrice"></span></th>
+<th onclick="sortPromoPrices('discount')">Скидка % <span class="sort-indicator promo-price-sort" id="promo-sort-discount"></span></th>
+<th>Период акции</th>
+<th onclick="sortPromoPrices('daysLeft')">Осталось дней <span class="sort-indicator promo-price-sort" id="promo-sort-daysLeft"></span></th>
+<th>Статус</th>
+<th onclick="sortPromoPrices('managerName')">Менеджер <span class="sort-indicator promo-price-sort" id="promo-sort-managerName"></span></th>
+</tr>
+</thead>
+<tbody id="promoPricesTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 5. Archive Section -->
+<div class="section" id="archiveSection">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Архив прошедших промо</div>
+<button type="button" class="btn-custom small" onclick="exportArchive()">
+Excel
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+<div class="card-body">
+<div class="card" style="padding: 20px; box-shadow: inset 5px 5px 10px #ebebeb, inset -5px -5px 10px #ffffff;">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Период с:</label>
+<input type="date" class="form-control" id="archiveDateFrom" onchange="loadArchive()">
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Период по:</label>
+<input type="date" class="form-control" id="archiveDateTo" onchange="loadArchive()">
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Сеть:</label>
+<select class="form-control" id="archiveNetwork" onchange="loadArchive()">
+<option value="">Все сети</option>
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Поиск:</label>
+<input type="text" class="form-control" id="archiveSearch" placeholder="Название" oninput="loadArchive()">
+</div>
+</div>
+</div>
+<div class="table-container mt-5">
+<table class="data-table">
+<thead>
+<tr>
+<th>Дата</th>
+<th>Сеть</th>
+<th>Акция</th>
+<th>Позиций</th>
+<th>Период</th>
+<th>Менеджер</th>
+<th>Статус</th>
+<th>Действия</th>
+</tr>
+</thead>
+<tbody id="archiveTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 6. Base Prices Section -->
+<div class="section" id="basePricesSection">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Базовые цены на продукцию</div>
+<div class="flex gap-3">
+<button type="button" class="btn-custom small" onclick="refreshBasePrices()">
+Обновить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small" id="editPricesBtn" onclick="toggleEditMode()" style="display: none;">
+Редактирование
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small success" id="savePricesBtn" onclick="savePriceChanges()" style="display: none;">
+Сохранить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small secondary" onclick="showVersionHistory()" style="display: none;" id="versionHistoryBtn">
+История изменений
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+<button type="button" class="btn-custom small" onclick="exportBasePrices()">
+Экспорт
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+</div>
+<div class="card-body">
+<div class="card mb-6" style="padding: 20px; box-shadow: inset 5px 5px 10px #ebebeb, inset -5px -5px 10px #ffffff;">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Канал / сеть:</label>
+<select class="form-control" id="priceNetwork" onchange="loadBasePrices()">
+<option value="">Все сети (полный прайс)</option>
+<option value="maria-ra">Мария-Ра</option>
+<option value="federal">Федеральные сети</option>
+<option value="local">Локальные сети</option>
+<option value="distributors">Дистрибьюторы</option>
+<option value="gorod">Город</option>
+<option value="rrc">РРЦ</option>
+<option value="rac">РАЦ</option>
+</select>
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Поиск по названию:</label>
+<input type="text" class="form-control" id="priceNameSearch" placeholder="Введите название" oninput="filterBasePrices()">
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Категория:</label>
+<select class="form-control" id="priceCategory" onchange="filterBasePrices()">
+<option value="">Все категории</option>
+<option value="dairy">Молочная продукция</option>
+<option value="bakery">Хлебобулочные изделия</option>
+<option value="grocery">Бакалея</option>
+<option value="oil">Масла</option>
+</select>
+</div>
+<div id="bulkEditControls" style="display: none;">
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Массовое изменение:</label>
+<div class="flex gap-2">
+<input type="number" class="form-control" id="bulkPercent" placeholder="%" step="1">
+<button type="button" class="btn-custom small warning" onclick="applyBulkChange()">Применить</button>
+</div>
+<select class="form-control mt-2" id="bulkChangeMode">
+<option value="selection">Только выбранные SKU</option>
+<option value="channel">Весь выбранный канал продаж</option>
+</select>
+<label class="flex items-center gap-2 mt-2">
+<input type="checkbox" id="proportionalChange" class="checkbox">
+<span class="text-sm text-gray-600">Изменить РАЦ и РРЦ пропорционально</span>
+</label>
+</div>
+</div>
+</div>
+<div class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th style="width: 45px;" id="priceSelectTh"><input type="checkbox" class="checkbox" id="selectAllPrices" onchange="toggleSelectAllPrices()"></th>
+<th onclick="sortBasePrices('name')">Наименование <span class="sort-indicator" id="sort-name"></span></th>
+<th onclick="sortBasePrices('category')">Категория <span class="sort-indicator" id="sort-category"></span></th>
+<th class="price-col" data-col="maria-ra">Мария-Ра <span class="sort-indicator" id="sort-maria-ra"></span></th>
+<th class="price-col" data-col="federal">Федеральные сети <span class="sort-indicator" id="sort-federal"></span></th>
+<th class="price-col" data-col="local">Локальные сети <span class="sort-indicator" id="sort-local"></span></th>
+<th class="price-col" data-col="distributors">Дистрибьюторы <span class="sort-indicator" id="sort-distributors"></span></th>
+<th class="price-col" data-col="gorod">Город <span class="sort-indicator" id="sort-gorod"></span></th>
+<th class="price-col" data-col="rrc">РРЦ <span class="sort-indicator" id="sort-rrc"></span></th>
+<th class="price-col" data-col="rac">РАЦ <span class="sort-indicator" id="sort-rac"></span></th>
+<th>Обновлено</th>
+</tr>
+</thead>
+<tbody id="basePricesTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 7. Tech Tasks Section -->
+<div class="section" id="techTasksSection">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-7">
+<div class="stat-card warning">
+<div class="stat-label">Ожидает обработки</div>
+<div class="stat-value warning" id="techStatPending">0</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">В работе</div>
+<div class="stat-value" id="techStatInProgress">0</div>
+</div>
+<div class="stat-card success">
+<div class="stat-label">Загружено сегодня</div>
+<div class="stat-value success" id="techStatDone">0</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Всего заявок</div>
+<div class="stat-value" id="techStatTotal">0</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<div class="card-title">Заявки на внесение промо</div>
+<div class="flex gap-3">
+<select class="form-control" style="width: 180px;" id="techFilterStatus" onchange="loadTechTasks()">
+<option value="">Все статусы</option>
+<option value="pending">Ожидают</option>
+<option value="in-progress">В работе</option>
+<option value="loaded">Загружено</option>
+<option value="returned">Возвращено</option>
+</select>
+<button type="button" class="btn-custom small" onclick="loadTechTasks()">
+Обновить
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+</div>
+<div class="card-body">
+<div id="techTasksContainer"></div>
+</div>
+</div>
+</div>
+
+<!-- 8. Tech History Section -->
+<div class="section" id="techHistorySection">
+<div class="card">
+<div class="card-header">
+<div class="card-title">История загрузок</div>
+<button type="button" class="btn-custom small" onclick="exportTechHistory()">
+Отчёт
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+<div class="card-body">
+<div class="card mb-6" style="padding: 20px; box-shadow: inset 5px 5px 10px #ebebeb, inset -5px -5px 10px #ffffff;">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Период с:</label>
+<input type="date" class="form-control" id="techHistoryFrom" onchange="loadTechHistory()">
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Период по:</label>
+<input type="date" class="form-control" id="techHistoryTo" onchange="loadTechHistory()">
+</div>
+<div>
+<label class="block mb-2 font-semibold text-gray-700 text-sm">Менеджер:</label>
+<select class="form-control" id="techHistoryManager" onchange="loadTechHistory()">
+<option value="">Все менеджеры</option>
+<option value="manager1">Александр</option>
+<option value="manager2">Елена</option>
+<option value="manager3">Дмитрий</option>
+</select>
+</div>
+</div>
+</div>
+<div class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th>Дата загрузки</th>
+<th>Менеджер</th>
+<th>Сеть</th>
+<th>Позиций</th>
+<th>Время</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody id="techHistoryTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+</main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="promoModal">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="promoModalTitle">Детали промо-акции</div>
+<button class="modal-close" onclick="closeModal('promoModal')">&times;</button>
+</div>
+<div class="modal-body" id="promoModalBody"></div>
+<div class="modal-footer">
+<button type="button" class="btn-custom" onclick="closeModal('promoModal')">
+Закрыть
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+</div>
+</div>
+
+<!-- Version History Modal -->
+<div class="modal-overlay" id="versionHistoryModal">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title">📜 Журнал изменений базовых цен</div>
+<button class="modal-close" onclick="closeModal('versionHistoryModal')">&times;</button>
+</div>
+<div class="modal-body" id="versionHistoryBody"></div>
+<div class="modal-footer">
+<button type="button" class="btn-custom" onclick="closeModal('versionHistoryModal')">
+Закрыть
+<svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path></svg>
+</button>
+</div>
+</div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/export.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/manager.js"></script>
+  <script src="assets/js/promos.js"></script>
+  <script src="assets/js/archive.js"></script>
+  <script src="assets/js/prices.js"></script>
+  <script src="assets/js/tech.js"></script>
+  <script src="assets/js/ui.js"></script>
+</body>
+</html>
