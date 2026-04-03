@@ -125,4 +125,19 @@ document.querySelectorAll('.section').forEach(section => section.classList.remov
 document.getElementById(sectionId).classList.add('active');
 }
 
-renderRoleOptions();
+// Откладываем рендеринг до загрузки конфигурации
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof staffConfig !== 'undefined') {
+        renderRoleOptions();
+    } else {
+        // Ждём загрузки config.js
+        const checkConfig = setInterval(() => {
+            if (typeof staffConfig !== 'undefined') {
+                clearInterval(checkConfig);
+                renderRoleOptions();
+            }
+        }, 50);
+        // Таймаут на случай если конфиг не загрузится
+        setTimeout(() => clearInterval(checkConfig), 3000);
+    }
+});

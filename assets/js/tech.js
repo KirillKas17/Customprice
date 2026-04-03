@@ -131,24 +131,41 @@ const tbody = document.getElementById('techHistoryTableBody');
 const dateFrom = document.getElementById('techHistoryFrom').value;
 const dateTo = document.getElementById('techHistoryTo').value;
 const manager = document.getElementById('techHistoryManager').value;
-const loadedPromos = promos.filter(promo => {
-if (promo.techStatus !== 'loaded') return false;
-if (dateFrom && promo.loadedAt < dateFrom) return false;
-if (dateTo && promo.loadedAt > `${dateTo} 23:59`) return false;
+
+// Включаем возвращённые акции в историю для полноты картины
+const loadedAndReturnedPromos = promos.filter(promo => {
+// Показываем загруженные и возвращённые акции
+if (promo.techStatus !== 'loaded' && promo.techStatus !== 'returned') return false;
+if (dateFrom) {
+const checkDate = promo.loadedAt || promo.returnedAt;
+if (checkDate < dateFrom) return false;
+}
+if (dateTo) {
+const checkDate = promo.loadedAt || promo.returnedAt;
+if (checkDate > `${dateTo} 23:59`) return false;
+}
 if (manager && promo.manager !== manager) return false;
 return true;
 });
 
-tbody.innerHTML = loadedPromos.map(promo => `
+tbody.innerHTML = loadedAndReturnedPromos.map(promo => {
+const isReturned = promo.techStatus === 'returned';
+const dateDisplay = promo.loadedAt || promo.returnedAt;
+const statusBadge = isReturned 
+    ? '<span class="status-badge warning">Возвращено</span>' 
+    : '<span class="status-badge loaded">Загружено</span>';
+const completedDate = isReturned ? '-' : (promo.taskCompletedAt || promo.loadedAt);
+
+return `
 <tr>
-<td>${promo.loadedAt}</td>
+<td>${dateDisplay}</td>
 <td>${promo.managerName}</td>
 <td>${promo.network}</td>
 <td>${promo.items.length}</td>
-<td>${promo.taskCompletedAt || promo.loadedAt}</td>
-<td><span class="status-badge loaded">Загружено</span></td>
-</tr>
-`).join('');
+<td>${completedDate}</td>
+<td>${statusBadge}</td>
+</tr>`;
+}).join('');
 }
 
 function exportTechHistory() {

@@ -168,21 +168,25 @@ showToast('error', 'Введите процент изменения');
 return;
 }
 
+// Ранняя проверка наличия выбранных SKU для режима selection
+if (mode === 'selection' && selectedPriceRows.length === 0) {
+showToast('warning', 'Для изменения выбранных SKU сначала отметьте позиции чекбоксами');
+return;
+}
+
+// Ранняя проверка выбранного канала
+if (!selectedNetwork) {
+showToast('warning', 'Для массового изменения сначала выберите канал продаж');
+return;
+}
+
 const changedBy = document.getElementById('userName').textContent;
 const changedAt = getNowStamp();
 let targets = [];
 
 if (mode === 'channel') {
-if (!selectedNetwork) {
-showToast('warning', 'Для массового изменения по каналу сначала выберите канал продаж');
-return;
-}
 targets = getFilteredBasePriceEntries().map(([sku]) => sku);
 } else {
-if (!selectedNetwork) {
-showToast('warning', 'Для изменения выбранных SKU сначала выберите канал продаж');
-return;
-}
 targets = [...selectedPriceRows];
 }
 

@@ -48,7 +48,13 @@ row.querySelector('.date-end').value = item.endDate;
 
 showSection('createPromoSection');
 updateNavTabs(document.querySelector('.nav-tab'));
-showToast('info', 'Возврат загружен в форму. После исправления укажите комментарий и отправьте повторно.');
+
+// Показываем комментарий техника о причинах возврата
+let message = 'Возврат загружен в форму. После исправления укажите комментарий и отправьте повторно.';
+if (promo.techReturnComment) {
+    message += `\n\nКомментарий техспециалиста: ${promo.techReturnComment}`;
+}
+showToast('info', message);
 }
 
 function addRow(name = '', basePrice = 0) {
@@ -65,10 +71,12 @@ row.innerHTML = `
 <td><input type="number" class="discount-input" placeholder="0" step="0.1" oninput="calculatePrice(this)"></td>
 <td><input type="date" class="date-start" value="${today}"></td>
 <td><input type="date" class="date-end" value="${nextMonthStr}"></td>
-<td><button type="button" class="btn-custom small danger" onclick="deleteRow(this)" style="padding:6px 12px;">Удалить</button></td>
+<td><button type="button" class="btn-custom small danger" onclick="deleteSingleRow(this)" style="padding:6px 12px;">Удалить</button></td>
 `;
 tbody.appendChild(row);
 }
+
+function deleteRow(btn) { btn.closest('tr').remove(); }
 
 function addBulkRows() {
 const checkbox = document.getElementById('bulkRowCheckbox');
@@ -156,6 +164,15 @@ if (checkboxes.length === 0) { showToast('warning', 'Выберите строк
 if (confirm(`Удалить ${checkboxes.length} строк?`)) {
 checkboxes.forEach(cb => cb.closest('tr').remove());
 showToast('success', `${checkboxes.length} строк удалено`);
+}
+}
+
+function deleteSingleRow(btn) {
+const row = btn.closest('tr');
+const name = row.querySelector('.name-input')?.value || 'эту позицию';
+if (confirm(`Удалить "${name}"?`)) {
+row.remove();
+showToast('success', 'Позиция удалена');
 }
 }
 
