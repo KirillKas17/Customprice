@@ -203,10 +203,13 @@ class PromoRequestHandler(SimpleHTTPRequestHandler):
 
 
 def main():
+    server = None  # Объявляем переменную заранее
+    
     # Обработка сигналов для graceful shutdown
     def signal_handler(signum, frame):
         logger.info(f"Received signal {signum}, shutting down gracefully...")
-        server.shutdown()
+        if server:
+            server.shutdown()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)

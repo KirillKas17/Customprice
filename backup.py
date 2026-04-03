@@ -1,13 +1,31 @@
 #!/usr/bin/env python3
 """Скрипт для резервного копирования базы данных Promo Manager."""
 
+import json
 import shutil
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DB_PATH = ROOT / "data" / "promo_manager.sqlite3"
+CONFIG_PATH = ROOT / "server_config.json"
+
+def load_config():
+    """Загружает конфигурацию из server_config.json."""
+    with CONFIG_PATH.open("r", encoding="utf-8") as fh:
+        config = json.load(fh)
+    return config
+
+def resolve_db_path(config):
+    """Определяет путь к базе данных из конфига."""
+    raw_path = config.get("database_path") or "data/promo_manager.sqlite3"
+    db_path = Path(raw_path)
+    if not db_path.is_absolute():
+        db_path = ROOT / db_path
+    return db_path
+
+CONFIG = load_config()
+DB_PATH = resolve_db_path(CONFIG)
 BACKUP_DIR = ROOT / "backups"
 
 def create_backup():

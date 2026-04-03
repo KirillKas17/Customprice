@@ -118,6 +118,9 @@ techTaskViewState = { promoId: null, page: 1, search: '', mode: 'details' };
 
 // ==================== ALERTS & TOASTS ====================
 function checkAlerts() {
+const container = document.getElementById('alertsContainer');
+if (!container) return; // Защита от отсутствия контейнера
+
 const today = new Date();
 const alerts = [];
 promos.forEach(promo => {
@@ -140,7 +143,6 @@ const pendingCount = promos.filter(p => p.techStatus === 'pending').length;
 if (pendingCount > 0) alerts.push({ type: 'info', message: `${pendingCount} заявок ожидают обработки` });
 }
 
-const container = document.getElementById('alertsContainer');
 container.innerHTML = alerts.map((alert, index) => `
 <div class="alert alert-${alert.type}" id="alert-${index}">
 <span>${alert.message}</span>
